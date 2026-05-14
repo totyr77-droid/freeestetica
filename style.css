@@ -7,7 +7,10 @@
   --line: #dfe6ee;
   --accent: #2f766d;
   --accent-dark: #1f5a54;
-  --shadow: 0 18px 45px rgba(32, 49, 60, 0.12);
+  --accent-soft: #e8f3f1;
+  --danger: #ce7767;
+  --shadow: 0 18px 45px rgba(32, 49, 60, 0.1);
+  --shadow-soft: 0 8px 24px rgba(32, 49, 60, 0.08);
 }
 
 * {
@@ -28,6 +31,9 @@ body {
   color: var(--text);
   font-family: "proxima-nova", Arial, sans-serif;
   font-weight: 400;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
 }
 
 button,
@@ -36,18 +42,22 @@ select {
   font: inherit;
 }
 
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .app {
-  width: min(1060px, calc(100% - 32px));
+  width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 32px 0;
+  padding: 28px 0 40px;
 }
 
 .app-header {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .eyebrow {
@@ -67,41 +77,54 @@ p {
 
 h1 {
   margin-bottom: 0;
-  font-size: clamp(30px, 5vw, 54px);
-  line-height: 1;
+  font-size: clamp(28px, 4.8vw, 50px);
+  line-height: 1.04;
 }
 
 .section-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   gap: 8px;
   padding: 6px;
-  margin-bottom: 18px;
-  background: rgba(255, 255, 255, 0.72);
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 8px 30px rgba(32, 49, 60, 0.06);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
 }
 
 .tab-button {
-  min-height: 42px;
-  padding: 0 18px;
+  flex: 1 1 0;
+  min-height: 46px;
+  padding: 0 16px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
   font-weight: 700;
+  line-height: 1.1;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
 .tab-button.active {
   background: var(--accent);
   color: #fff;
+  box-shadow: 0 8px 18px rgba(47, 118, 109, 0.22);
+}
+
+.tab-button:not(.active):hover {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
 }
 
 .workspace {
   display: none;
-  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 20px;
   align-items: start;
 }
 
@@ -115,13 +138,15 @@ h1 {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
 }
 
 .formulario {
   display: grid;
-  gap: 18px;
-  padding: 22px;
+  gap: 16px;
+  padding: 20px;
+  position: sticky;
+  top: 82px;
 }
 
 .field {
@@ -132,20 +157,29 @@ h1 {
 
 .field label {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .field select,
 .field input {
   width: 100%;
-  min-height: 44px;
-  padding: 0 12px;
+  min-height: 48px;
+  padding: 0 14px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--surface-soft);
   color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.field select:hover,
+.field input:hover {
+  border-color: #c8d4df;
+  background: #ffffff;
 }
 
 .field select:focus,
@@ -161,37 +195,44 @@ h1 {
 }
 
 .primary-button {
-  min-height: 46px;
+  min-height: 50px;
   border: 0;
   border-radius: 6px;
   background: var(--accent-dark);
   color: #fff;
   cursor: pointer;
   font-weight: 800;
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .primary-button:hover {
   background: #184943;
+  box-shadow: 0 10px 22px rgba(31, 90, 84, 0.22);
+}
+
+.primary-button:active {
+  transform: translateY(1px);
 }
 
 .preview-panel {
-  min-height: 520px;
+  min-height: 560px;
   display: grid;
   place-items: center;
-  padding: 18px;
+  padding: 20px;
 }
 
 .empty-preview {
   width: 100%;
-  min-height: 420px;
+  min-height: 500px;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 24px 18px;
   border: 1px dashed #c8d4df;
   border-radius: 8px;
   color: var(--muted);
   text-align: center;
   background: var(--surface-soft);
+  font-weight: 600;
 }
 
 .preview-container {
@@ -200,10 +241,12 @@ h1 {
 }
 
 .preview-container img {
-  width: min(100%, 420px);
+  width: min(100%, 430px);
+  max-height: min(72vh, 760px);
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: 0 16px 36px rgba(32, 49, 60, 0.16);
+  object-fit: contain;
 }
 
 .coming-soon {
@@ -324,33 +367,100 @@ h1 {
 
 @media (max-width: 760px) {
   .app {
-    width: min(100% - 20px, 540px);
-    padding: 20px 0;
+    width: min(100% - 18px, 560px);
+    padding: 16px 0 28px;
   }
 
   .app-header {
-    align-items: start;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .eyebrow {
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 10vw, 42px);
   }
 
   .section-tabs {
+    top: 0;
+    gap: 6px;
+    padding: 5px;
+    margin-inline: -2px;
+    margin-bottom: 14px;
     overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .section-tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .tab-button {
-    flex: 1 0 max-content;
+    flex: 0 0 auto;
+    min-width: max-content;
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
   }
 
   .workspace,
   .workspace.active {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .formulario {
+    position: static;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .field select,
+  .field input {
+    min-height: 50px;
+    font-size: 16px;
   }
 
   .preview-panel {
-    min-height: 360px;
+    min-height: auto;
+    padding: 12px;
   }
 
   .empty-preview {
-    min-height: 280px;
+    min-height: 260px;
+    font-size: 15px;
+  }
+
+  .preview-container img {
+    width: min(100%, 360px);
+    max-height: 62vh;
+  }
+}
+
+@media (max-width: 420px) {
+  .app {
+    width: min(100% - 14px, 420px);
+  }
+
+  .tab-button {
+    min-height: 42px;
+    padding: 0 12px;
+  }
+
+  .formulario {
+    padding: 14px;
+  }
+
+  .primary-button {
+    min-height: 48px;
+  }
+
+  .preview-container img {
+    width: min(100%, 320px);
   }
 }
