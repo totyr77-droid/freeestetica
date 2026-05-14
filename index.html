@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Flayers Free Estetica</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://use.typekit.net">
+  <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
+  <link rel="stylesheet" href="style.css?v=8">
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Generador de piezas</p>
+        <h1>Flayers Free Estetica</h1>
+      </div>
+    </header>
+
+    <nav class="section-tabs" aria-label="Secciones">
+      <button class="tab-button active" type="button" data-section="recordatorio">Recordatorio</button>
+      <button class="tab-button" type="button" data-section="ultimos-turnos">&Uacute;ltimos turnos</button>
+      <button class="tab-button" type="button" data-section="gift-card">Gift card</button>
+    </nav>
+
+    <section class="workspace active" id="section-recordatorio">
+      <form class="formulario" aria-label="Crear imagen de recordatorio">
+        <div class="field">
+          <label for="recordatorioMaquina">M&aacute;quina</label>
+          <select id="recordatorioMaquina">
+            <option value="vela">Velaslim</option>
+            <option value="depi">Depilaci&oacute;n</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="recordatorioFecha">Fecha</label>
+          <input type="date" id="recordatorioFecha">
+        </div>
+
+        <div class="actions" id="recordatorioBotones" hidden>
+          <button class="primary-button" type="button" data-download="recordatorio">Descargar imagen</button>
+        </div>
+      </form>
+
+      <div class="preview-panel">
+        <div class="empty-preview" id="recordatorioEmpty">
+          Eleg&iacute; una m&aacute;quina y una fecha para ver la imagen.
+        </div>
+        <div class="preview-container" id="recordatorioPreview" hidden></div>
+      </div>
+    </section>
+
+    <section class="workspace" id="section-ultimos-turnos" hidden>
+      <form class="formulario" aria-label="Crear imagen de &uacute;ltimos turnos">
+        <div class="field">
+          <label for="ultimosMaquina">M&aacute;quina</label>
+          <select id="ultimosMaquina">
+            <option value="vela">Velaslim</option>
+            <option value="depi">Depilaci&oacute;n</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="ultimosFecha">Fecha</label>
+          <input type="date" id="ultimosFecha">
+        </div>
+
+        <div class="actions" id="ultimosBotones" hidden>
+          <button class="primary-button" type="button" data-download="ultimos">Descargar imagen</button>
+        </div>
+      </form>
+
+      <div class="preview-panel">
+        <div class="empty-preview" id="ultimosEmpty">
+          Eleg&iacute; una m&aacute;quina y una fecha para ver la imagen.
+        </div>
+        <div class="preview-container" id="ultimosPreview" hidden></div>
+      </div>
+    </section>
+
+    <section class="workspace" id="section-gift-card" hidden>
+      <form class="formulario" aria-label="Crear gift card">
+        <div class="field">
+          <label for="giftPremioInput">Premio</label>
+          <input type="text" id="giftPremioInput" placeholder="Ej: 1 sesi&oacute;n de Velaslim">
+        </div>
+
+        <div class="field">
+          <label for="giftParaInput">Para</label>
+          <input type="text" id="giftParaInput" placeholder="Nombre de quien recibe">
+        </div>
+
+        <div class="field">
+          <label for="giftDeInput">De</label>
+          <input type="text" id="giftDeInput" placeholder="Nombre de quien regala">
+        </div>
+
+        <div class="actions" id="giftBotones" hidden>
+          <button class="primary-button" type="button" data-download="gift">Descargar imagen</button>
+        </div>
+      </form>
+
+      <div class="preview-panel">
+        <div class="empty-preview" id="giftEmpty">
+          Complet&aacute; premio, para y de para ver la gift card.
+        </div>
+        <div class="preview-container" id="giftPreview" hidden></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="export" aria-hidden="true" style="visibility: hidden; position: absolute; top: -9999px; left: -9999px;">
+    <img class="capa fondo" id="fondo" src="" alt="">
+    <img class="capa base" id="base" src="base/base.png" alt="">
+    <img class="capa maquina" id="maquina" src="" alt="">
+    <div class="capa fecha" id="fechaTexto">FECHA AQU&Iacute;</div>
+    <div class="capa fecha fecha-ultimos fecha-ultimos-uno" id="fechaUltimosUno" hidden>FECHA AQU&Iacute;</div>
+    <div class="capa fecha fecha-ultimos fecha-ultimos-dos" id="fechaUltimosDos" hidden>FECHA AQU&Iacute;</div>
+    <div class="capa gift-text gift-premio" id="giftPremioTexto" hidden>PREMIO</div>
+    <div class="capa gift-text gift-para" id="giftParaTexto" hidden>PARA</div>
+    <div class="capa gift-text gift-de" id="giftDeTexto" hidden>DE</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
