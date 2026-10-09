@@ -310,8 +310,8 @@ h1 {
 #export {
   width: 1127px;
   height: 2008px;
-  position: absolute;
-  top: -9999px;
+  position: fixed;
+  top: 0;
   left: -9999px;
   visibility: hidden;
   background: white;

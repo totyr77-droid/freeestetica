@@ -389,15 +389,20 @@ function prepararVista(tipo, revision) {
 }
 
 async function capturarImagen() {
+  let marcoCaptura;
   exportDiv.style.visibility = "visible";
   try {
     return await html2canvas(exportDiv, {
       useCORS: true,
       backgroundColor: null,
-      onclone: documento => cargarFuentesExport(documento)
+      onclone: documento => {
+        marcoCaptura = documento.defaultView.frameElement;
+        return cargarFuentesExport(documento);
+      }
     });
   } finally {
     exportDiv.style.visibility = "hidden";
+    if (marcoCaptura) marcoCaptura.remove();
   }
 }
 
