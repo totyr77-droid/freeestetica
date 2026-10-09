@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="img/logo.png">
   <link rel="preconnect" href="https://use.typekit.net">
   <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
   <main class="app">
@@ -26,6 +26,7 @@
       <button class="tab-button active" type="button" data-section="recordatorio">Recordatorio</button>
       <button class="tab-button" type="button" data-section="ultimos-turnos">&Uacute;ltimos turnos</button>
       <button class="tab-button" type="button" data-section="gift-card">Gift card</button>
+      <button class="tab-button" type="button" data-section="agenda">Agenda</button>
     </nav>
 
     <section class="workspace active" id="section-recordatorio">
@@ -87,7 +88,7 @@
     <section class="workspace" id="section-gift-card" hidden>
       <form class="formulario" aria-label="Crear gift card">
         <div class="field">
-          <label for="giftPremioInput">Premio</label>
+          <label for="giftPremioInput">Regalo</label>
           <input type="text" id="giftPremioInput" placeholder="Ej: 1 sesi&oacute;n de Velaslim">
         </div>
 
@@ -113,6 +114,43 @@
         <div class="preview-container" id="giftPreview" hidden></div>
       </div>
     </section>
+    <section class="workspace" id="section-agenda" hidden>
+      <form class="formulario" aria-label="Crear imagen de agenda">
+        <div class="field">
+          <label for="agendaMaquina">M&aacute;quina / agenda</label>
+          <select id="agendaMaquina">
+            <option value="depi">Depilaci&oacute;n definitiva</option>
+            <option value="vela">Velaslim</option>
+          </select>
+        </div>
+        <div id="agendaFechas">
+        <fieldset class="agenda-fila">
+          <legend>Fecha 1</legend>
+        <div class="field">
+          <label for="agendaFecha">Fecha</label>
+          <input type="date" id="agendaFecha">
+        </div>
+        <div class="field">
+          <label for="agendaEstado">Estado</label>
+          <select id="agendaEstado">
+            <option value="">Sin etiqueta</option>
+            <option value="nueva">NUEVA FECHA</option>
+            <option value="agotado">AGOTADO</option>
+          </select>
+        </div>
+        <button class="agenda-quitar" type="button" title="Quitar fecha" aria-label="Quitar fecha 1"><span aria-hidden="true">&times;</span></button>
+        </fieldset>
+        </div>
+        <button class="agenda-agregar" type="button" id="agendaAgregar"><span aria-hidden="true">+</span> Agregar fecha</button>
+        <div class="actions" id="agendaBotones" hidden>
+          <button class="primary-button" type="button" data-download="agenda">Descargar imagen</button>
+        </div>
+      </form>
+      <div class="preview-panel">
+        <div class="empty-preview" id="agendaEmpty">Eleg&iacute; una fecha para ver la agenda.</div>
+        <div class="preview-container" id="agendaPreview" hidden></div>
+      </div>
+    </section>
   </main>
 
   <div id="export" aria-hidden="true" style="visibility: hidden; position: absolute; top: -9999px; left: -9999px;">
@@ -122,12 +160,32 @@
     <div class="capa fecha" id="fechaTexto">FECHA AQU&Iacute;</div>
     <div class="capa fecha fecha-ultimos fecha-ultimos-uno" id="fechaUltimosUno" hidden>FECHA AQU&Iacute;</div>
     <div class="capa fecha fecha-ultimos fecha-ultimos-dos" id="fechaUltimosDos" hidden>FECHA AQU&Iacute;</div>
-    <div class="capa gift-text gift-premio" id="giftPremioTexto" hidden>PREMIO</div>
-    <div class="capa gift-text gift-para" id="giftParaTexto" hidden>PARA</div>
-    <div class="capa gift-text gift-de" id="giftDeTexto" hidden>DE</div>
+    <div class="capa gift-text gift-premio" id="giftPremioTexto" hidden><span class="gift-valor"></span></div>
+    <div class="capa gift-text gift-para" id="giftParaTexto" hidden><span class="gift-etiqueta">Para:</span><span class="gift-valor"></span></div>
+    <div class="capa gift-text gift-de" id="giftDeTexto" hidden><span class="gift-etiqueta">De:</span><span class="gift-valor"></span></div>
+    <div id="agendaArte" hidden>
+      <img class="capa" id="agendaFondo" src="img/caratula/base.png" alt="">
+      <div class="agenda-banda agenda-texto" id="agendaNombre">DEPILACI&Oacute;N DEFINITIVA</div>
+      <div class="agenda-equipo"><img id="agendaMaquinaImagen" src="img/caratula/maquina/depi.png" alt=""></div>
+      <div id="agendaBloques"></div>
+      <div class="agenda-aviso agenda-texto" id="agendaAviso" hidden>
+        <strong>ATENCI&Oacute;N</strong><br>
+        LOS TURNOS SE AGENDAN<br>
+        &Uacute;NICAMENTE CON EL <strong>50% DEL VALOR</strong><br>
+        DE LA SESI&Oacute;N<br>
+        <span class="agenda-aviso-final">SIN EXCEPCI&Oacute;N</span>
+      </div>
+      <template id="agendaBloquePlantilla">
+      <div class="agenda-bloque">
+        <img class="agenda-box" src="img/caratula/box.png" alt="">
+        <div class="agenda-fecha agenda-texto"><div class="agenda-dia"></div><div class="agenda-mes"></div></div>
+        <div class="agenda-marca"><img src="img/caratula/logo/depi.png" alt=""></div>
+      </div>
+      </template>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=22"></script>
 </body>
 </html>

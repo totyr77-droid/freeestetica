@@ -18,6 +18,10 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -40,6 +44,7 @@ body {
 button,
 input,
 select {
+  max-width: 100%;
   font: inherit;
 }
 
@@ -162,6 +167,7 @@ h1 {
 .formulario {
   display: grid;
   gap: 16px;
+  min-width: 0;
   padding: 20px;
   position: sticky;
   top: 82px;
@@ -170,6 +176,7 @@ h1 {
 .field {
   display: grid;
   gap: 8px;
+  min-width: 0;
   text-align: left;
 }
 
@@ -183,7 +190,11 @@ h1 {
 
 .field select,
 .field input {
+  display: block;
+  appearance: none;
+  -webkit-appearance: none;
   width: 100%;
+  min-width: 0;
   min-height: 48px;
   padding: 0 14px;
   border: 1px solid var(--line);
@@ -192,6 +203,20 @@ h1 {
   color: var(--text);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
   transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.field input[type="date"] {
+  line-height: 48px;
+}
+
+.field input[type="date"]::-webkit-date-and-time-value {
+  min-height: 48px;
+  text-align: left;
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+  flex: 0 0 auto;
+  margin-right: 0;
 }
 
 .field select:hover,
@@ -304,7 +329,7 @@ h1 {
 
 #export .fecha,
 #export .gift-text {
-  font-family: "proxima-nova", Arial, sans-serif;
+  font-family: "korolev", Arial, sans-serif;
   font-weight: 500;
   font-style: normal;
 }
@@ -346,41 +371,101 @@ h1 {
 .gift-text {
   left: 50%;
   z-index: 6;
-  width: auto;
-  height: auto;
+  width: 880px;
+  height: 112px;
   max-width: 880px;
   transform: translateX(-50%);
-  color: #ffffff;
+  color: #00c5d5;
   line-height: 1.1;
   text-align: center;
   text-transform: uppercase;
   white-space: normal;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
 }
 
+.gift-valor { display: block; width: 100%; flex: 0 0 auto; overflow-wrap: anywhere; white-space: pre-wrap; }
+.gift-etiqueta { display: block; flex: 0 0 auto; font-size: 36px; font-weight: 700; line-height: 1; text-transform: none; color: #00c5d5; }
+
 .gift-premio {
-  width: 100%;
+  height: 240px;
+  padding: 24px 32px;
   color: #00c5d5;
   top: 1100px;
-  font-size: 58px;
+  font-size: 72px;
 }
 
 .gift-para {
-  width: 100%;
-  color: #00c5d5;
-  top: 1380px;
-  font-size: 52px;
+  top: 1370px;
+  font-size: 50px;
   font-weight: 500;
 }
 
 .gift-de {
-  color: #00c5d5;
-  top: 1570px;
-  font-size: 46px;
+  top: 1500px;
+  font-size: 50px;
   font-weight: 500;
 }
 
 #export .gift-premio {
-  font-weight: 300;
+  font-weight: 700;
+}
+
+#agendaArte {
+  position: absolute;
+  inset: 0;
+  background: #00bfcc;
+  overflow: hidden;
+}
+
+.agenda-texto {
+  font-family: "korolev", Arial, sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  text-align: center;
+  line-height: 1.2;
+  color: #0bbac8;
+}
+.agenda-banda { position: absolute; top: 318px; left: 52px; width: 1023px; height: 81px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; font-weight: 700; }
+.agenda-equipo { position: absolute; left: 820px; top: 100px; width: 250px; height: 440px; overflow: hidden; }
+.agenda-equipo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.agenda-bloque { position: absolute; top: 612px; left: 186.5px; width: 754px; height: 251px; transform-origin: top left; }
+.agenda-box { position: absolute; inset: 0; width: 754px; height: 251px; object-fit: contain; }
+.agenda-fecha { position: absolute; left: 284px; right: 18px; top: 31px; font-size: 61px; }
+.agenda-marca { position: absolute; top: 176px; left: 47px; width: 357px; height: 68px; display: flex; align-items: center; justify-content: center; }
+.agenda-marca img { display: block; width: auto; height: auto; max-width: none; flex-shrink: 0; }
+
+.agenda-aviso { position: absolute; left: 90px; right: 90px; font-size: 48px; line-height: 1.2; }
+.agenda-aviso-final { display: inline-block; margin-top: 24px; }
+#section-agenda { grid-template-columns: minmax(360px, 430px) minmax(0, 1fr); }
+#section-agenda .formulario { position: static; gap: 14px; padding: 16px; }
+#agendaFechas { display: grid; gap: 10px; }
+.agenda-fila { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 32px; align-items: end; gap: 8px; margin: 0; min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); }
+.agenda-fila legend { padding: 0 5px; font-size: 12px; font-weight: 700; color: var(--accent-dark); }
+.agenda-fila .field { gap: 4px; }
+.agenda-fila .field label { font-size: 10px; }
+#section-agenda .agenda-fila input,
+#section-agenda .agenda-fila select { min-height: 38px; padding: 0 7px; background: white; font-size: 14px; line-height: normal; }
+#section-agenda .agenda-fila input[type="date"]::-webkit-date-and-time-value { min-height: auto; }
+.agenda-agregar,
+.agenda-quitar { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid #c6e8eb; border-radius: 6px; background: #eefafb; color: #007f89; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; transition: background 160ms ease, border-color 160ms ease; }
+.agenda-agregar { min-height: 38px; padding: 8px 12px; }
+.agenda-agregar > span { font-size: 20px; font-weight: 400; line-height: 1; }
+.agenda-quitar { width: 32px; height: 38px; background: white; border-color: var(--line); color: var(--muted); font-size: 23px; font-weight: 400; }
+.agenda-agregar:hover { background: #dcf4f6; border-color: #8bcdd2; }
+.agenda-quitar:hover { background: #fff0ee; border-color: #eac8c2; color: #a2473c; }
+.agenda-agregar:focus-visible,
+.agenda-quitar:focus-visible { outline: 3px solid rgba(0, 197, 213, 0.28); outline-offset: 2px; }
+#agendaPreview { display: grid; gap: 24px; }
+.agenda-pagina { margin: 0; }
+.agenda-pagina figcaption { display: flex; align-items: center; justify-content: space-between; gap: 10px; max-width: 430px; margin: 10px auto 0; color: var(--muted); font-size: 13px; }
+@media (max-width: 760px) {
+  #section-agenda { grid-template-columns: minmax(0, 1fr); }
+  #section-agenda .agenda-fila input,
+  #section-agenda .agenda-fila select { font-size: 16px; min-height: 42px; }
+  .agenda-quitar { height: 42px; }
 }
 
 @media (max-width: 760px) {
@@ -436,12 +521,22 @@ h1 {
     position: static;
     gap: 14px;
     padding: 16px;
+    overflow: hidden;
   }
 
   .field select,
   .field input {
     min-height: 50px;
     font-size: 16px;
+  }
+
+  .field input[type="date"] {
+    line-height: 50px;
+    padding-right: 10px;
+  }
+
+  .field input[type="date"]::-webkit-date-and-time-value {
+    min-height: 50px;
   }
 
   .preview-panel {

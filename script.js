@@ -8,11 +8,21 @@ const giftPremioTexto = document.getElementById("giftPremioTexto");
 const giftParaTexto = document.getElementById("giftParaTexto");
 const giftDeTexto = document.getElementById("giftDeTexto");
 const exportDiv = document.getElementById("export");
+const agendaArte = document.getElementById("agendaArte");
 
-const tabButtons = document.querySelectorAll(".tab-button");
+const tabButtons = document.querySelectorAll(".section-tabs [data-section]");
 const sections = document.querySelectorAll(".workspace");
 
 const piezas = {
+  agenda: {
+    maquina: document.getElementById("agendaMaquina"),
+    fecha: document.getElementById("agendaFecha"),
+    estado: document.getElementById("agendaEstado"),
+    preview: document.getElementById("agendaPreview"),
+    empty: document.getElementById("agendaEmpty"),
+    botones: document.getElementById("agendaBotones"),
+    canvas: null
+  },
   recordatorio: {
     maquina: document.getElementById("recordatorioMaquina"),
     fecha: document.getElementById("recordatorioFecha"),
@@ -93,15 +103,34 @@ function cargarImagen(img) {
   });
 }
 
+async function cargarFuentesExport(documento = document) {
+  await documento.fonts.ready;
+  const capas = documento.querySelectorAll("#export .fecha, #export .gift-text, #export .agenda-texto");
+  await Promise.all(Array.from(capas, capa => {
+    if (capa.hidden || capa.closest("[hidden]")) return;
+    const estilo = documento.defaultView.getComputedStyle(capa);
+    return documento.fonts.load(
+      `${estilo.fontStyle} ${estilo.fontWeight} ${estilo.fontSize} "korolev"`,
+      capa.textContent.toUpperCase()
+    ).then(fuentes => {
+      if (!fuentes.length) {
+        throw new Error("No se pudo cargar la fuente Korolev de Adobe Fonts.");
+      }
+    });
+  }));
+}
+
 function resetearVistaPrevia(tipo) {
   const pieza = piezas[tipo];
   pieza.canvas = null;
+  pieza.canvases = [];
   pieza.preview.hidden = true;
   pieza.empty.hidden = false;
   pieza.botones.hidden = true;
 }
 
 function ocultarCapasTexto() {
+  agendaArte.hidden = true;
   fechaTexto.hidden = true;
   fechaUltimosUno.hidden = true;
   fechaUltimosDos.hidden = true;
@@ -147,18 +176,177 @@ function configurarGiftCard() {
   maquinaImg.hidden = true;
   ocultarCapasTexto();
 
-  giftPremioTexto.textContent = premio || "PREMIO";
-  giftParaTexto.textContent = para || "PARA";
-  giftDeTexto.textContent = de || "DE";
-  giftPremioTexto.hidden = false;
-  giftParaTexto.hidden = false;
-  giftDeTexto.hidden = false;
+  giftPremioTexto.querySelector(".gift-valor").textContent = premio;
+  giftParaTexto.querySelector(".gift-valor").textContent = para;
+  giftDeTexto.querySelector(".gift-valor").textContent = de;
+  giftPremioTexto.hidden = !premio;
+  giftParaTexto.hidden = !para;
+  giftDeTexto.hidden = !de;
 
   return [fondoImg];
 }
 
+function ajustarTextoGift(elemento, alturaDisponible, tamanoMaximo) {
+  // Medir con Korolev ya cargada, incluyendo saltos y palabras sin espacios.
+  let minimo = 1;
+  let maximo = tamanoMaximo;
+  let elegido = minimo;
+  while (minimo <= maximo) {
+    const tamano = Math.floor((minimo + maximo) / 2);
+    elemento.style.fontSize = `${tamano}px`;
+    if (elemento.scrollHeight <= alturaDisponible && elemento.scrollWidth <= elemento.clientWidth) {
+      elegido = tamano;
+      minimo = tamano + 1;
+    } else {
+      maximo = tamano - 1;
+    }
+  }
+  elemento.style.fontSize = `${elegido}px`;
+}
+
+function ajustarGiftCard() {
+  [giftPremioTexto, giftParaTexto, giftDeTexto].forEach(capa => {
+    if (capa.hidden) return;
+    const estilo = getComputedStyle(capa);
+    const etiqueta = capa.querySelector(".gift-etiqueta");
+    const altura = capa.clientHeight - parseFloat(estilo.paddingTop) - parseFloat(estilo.paddingBottom)
+      - (etiqueta ? etiqueta.offsetHeight + 8 : 0);
+    ajustarTextoGift(capa.querySelector(".gift-valor"), altura, capa === giftPremioTexto ? 72 : 50);
+  });
+}
+
+function obtenerFechasAgenda() {
+  return Array.from(document.querySelectorAll("#agendaFechas .agenda-fila"), fila => ({
+    fecha: fila.querySelector('input[type="date"]').value,
+    estado: fila.querySelector("select").value
+  })).filter(item => item.fecha);
+}
+
+function calcularDistribucionAgenda(cantidad) {
+  const escala = cantidad === 4 ? 0.9 : 1;
+  return {
+    escala,
+    izquierda: (1127 - 754 * escala) / 2,
+    inicio: cantidad === 4 ? 580 : 612,
+    paso: 251 * escala + (cantidad === 4 ? 35 : 65)
+  };
+}
+
+function dividirFechasAgenda(fechas) {
+  const paginas = [];
+  for (let indice = 0; indice < fechas.length; indice += 4) {
+    paginas.push(fechas.slice(indice, indice + 4));
+  }
+  return paginas.length ? paginas : [[]];
+}
+
+function configurarAgenda(fechas = obtenerFechasAgenda(), maquina = piezas.agenda.maquina.value) {
+  ocultarCapasTexto();
+  fondoImg.hidden = true;
+  baseImg.hidden = true;
+  maquinaImg.hidden = true;
+  agendaArte.hidden = false;
+  document.getElementById("agendaAviso").hidden = true;
+  document.getElementById("agendaNombre").textContent = maquina === "vela" ? "VELASLIM" : "DEPILACI\u00d3N DEFINITIVA";
+  document.getElementById("agendaMaquinaImagen").src = `img/caratula/maquina/${maquina}.png`;
+  const boxes = {
+    "": "box.png",
+    nueva: "box-nueva.png",
+    agotado: "box-agotado.png"
+  };
+  const distribucion = calcularDistribucionAgenda(fechas.length);
+  const contenedor = document.getElementById("agendaBloques");
+  contenedor.replaceChildren();
+  fechas.forEach((item, indice) => {
+    const bloque = document.getElementById("agendaBloquePlantilla").content.firstElementChild.cloneNode(true);
+    bloque.style.top = `${distribucion.inicio + indice * distribucion.paso}px`;
+    bloque.style.left = `${distribucion.izquierda}px`;
+    bloque.style.transform = `scale(${distribucion.escala})`;
+    bloque.querySelector(".agenda-box").src = `img/caratula/${boxes[item.estado] || boxes[""]}`;
+    bloque.querySelector(".agenda-marca img").src = `img/caratula/logo/${maquina}.png`;
+    const fecha = new Date(`${item.fecha}T12:00:00`);
+    bloque.querySelector(".agenda-dia").textContent = `${fecha.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase()} ${fecha.getDate()}`;
+    bloque.querySelector(".agenda-mes").textContent = fecha.toLocaleDateString("es-AR", { month: "long" }).toUpperCase();
+    contenedor.appendChild(bloque);
+  });
+  return Array.from(agendaArte.querySelectorAll("img"));
+}
+
+async function ajustarAvisoAgenda(cantidad) {
+  const aviso = document.getElementById("agendaAviso");
+  if (!cantidad) return;
+  const distribucion = calcularDistribucionAgenda(cantidad);
+  const finalBoxes = distribucion.inicio + (cantidad - 1) * distribucion.paso + 251 * distribucion.escala;
+  const inicio = finalBoxes + 32;
+  const limite = 1620;
+  aviso.hidden = false;
+  await cargarFuentesExport();
+  const altura = aviso.offsetHeight;
+  aviso.hidden = inicio + altura > limite;
+  if (!aviso.hidden) aviso.style.top = `${inicio + (limite - inicio - altura) / 2}px`;
+}
+
+async function generarAgenda(revision) {
+  const pieza = piezas.agenda;
+  const maquina = pieza.maquina.value;
+  const paginas = dividirFechasAgenda(obtenerFechasAgenda());
+  const canvases = [];
+  for (const fechas of paginas) {
+    if (revision !== revisiones.agenda) return;
+    await Promise.all(configurarAgenda(fechas, maquina).map(cargarImagen));
+    await cargarFuentesExport();
+    await ajustarAvisoAgenda(fechas.length);
+    canvases.push(await capturarImagen());
+  }
+  if (revision !== revisiones.agenda) return;
+  pieza.canvases = canvases;
+  pieza.canvas = canvases[0];
+  pieza.preview.replaceChildren();
+  canvases.forEach((canvas, indice) => {
+    const tarjeta = document.createElement("figure");
+    tarjeta.className = "agenda-pagina";
+    const url = canvas.toDataURL("image/png");
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = `Agenda, imagen ${indice + 1} de ${canvases.length}`;
+    const pie = document.createElement("figcaption");
+    const etiqueta = document.createElement("span");
+    etiqueta.textContent = `Imagen ${indice + 1} de ${canvases.length}`;
+    const descarga = document.createElement("a");
+    descarga.className = "agenda-agregar";
+    descarga.textContent = "Descargar PNG";
+    descarga.href = url;
+    descarga.download = `agenda_${maquina}_${indice + 1}.png`;
+    pie.append(etiqueta, descarga);
+    tarjeta.append(img, pie);
+    pieza.preview.appendChild(tarjeta);
+  });
+  pieza.preview.hidden = false;
+  pieza.empty.hidden = true;
+  pieza.botones.hidden = true;
+}
+
+// Las secciones comparten el mismo lienzo: procesar una captura por vez.
+let colaGeneracion = Promise.resolve();
+const revisiones = {};
 function actualizarVista(tipo) {
+  const revision = revisiones[tipo] = (revisiones[tipo] || 0) + 1;
+  resetearVistaPrevia(tipo);
+  colaGeneracion = colaGeneracion.then(() => {
+    if (revision !== revisiones[tipo]) return;
+    return prepararVista(tipo, revision);
+  }).catch(err => {
+    console.error(err);
+    alert("No se pudo generar la imagen. Verific\u00e1 la conexi\u00f3n, las fuentes y las rutas.");
+  });
+}
+
+function prepararVista(tipo, revision) {
   const pieza = piezas[tipo];
+  if (tipo === "agenda") {
+    return generarAgenda(revision);
+  }
+  fondoImg.hidden = false;
   if (tipo === "gift") {
     const tieneTexto = pieza.premio.value.trim() || pieza.para.value.trim() || pieza.de.value.trim();
 
@@ -167,13 +355,16 @@ function actualizarVista(tipo) {
       return;
     }
 
-    Promise.all([
-      document.fonts.ready,
+    return Promise.all([
       ...configurarGiftCard().map(cargarImagen)
     ])
+      .then(() => cargarFuentesExport())
+      .then(() => ajustarGiftCard())
       .then(() => generarVistaPrevia(tipo))
-      .catch(() => alert("Error cargando im\u00e1genes. Verific\u00e1 nombres y rutas."));
-    return;
+      .catch(err => {
+        console.error(err);
+        alert("No se pudieron cargar las im\u00e1genes o la fuente de Adobe. Verific\u00e1 la conexi\u00f3n y las rutas.");
+      });
   }
 
   const maquina = pieza.maquina.value;
@@ -186,23 +377,33 @@ function actualizarVista(tipo) {
 
   const imagenes = configurarExport(tipo, maquina, fecha);
 
-  Promise.all([
-    document.fonts.ready,
+  return Promise.all([
     ...imagenes.map(cargarImagen)
   ])
+    .then(() => cargarFuentesExport())
     .then(() => generarVistaPrevia(tipo))
-    .catch(() => alert("Error cargando im\u00e1genes. Verific\u00e1 nombres y rutas."));
+    .catch(err => {
+      console.error(err);
+      alert("No se pudieron cargar las im\u00e1genes o la fuente de Adobe. Verific\u00e1 la conexi\u00f3n y las rutas.");
+    });
+}
+
+async function capturarImagen() {
+  exportDiv.style.visibility = "visible";
+  try {
+    return await html2canvas(exportDiv, {
+      useCORS: true,
+      backgroundColor: null,
+      onclone: documento => cargarFuentesExport(documento)
+    });
+  } finally {
+    exportDiv.style.visibility = "hidden";
+  }
 }
 
 function generarVistaPrevia(tipo) {
   const pieza = piezas[tipo];
-  exportDiv.style.visibility = "visible";
-
-  html2canvas(exportDiv, {
-    useCORS: true,
-    backgroundColor: null
-  }).then(canvas => {
-    exportDiv.style.visibility = "hidden";
+  return capturarImagen().then(canvas => {
     pieza.canvas = canvas;
 
     pieza.preview.innerHTML = "";
@@ -234,7 +435,9 @@ function descargarImagen(tipo) {
     const link = document.createElement("a");
     const detalleArchivo = tipo === "gift"
       ? pieza.para.value.trim().replaceAll(" ", "_").toLowerCase() || "gift_card"
-      : `${pieza.maquina.value}_${pieza.fecha.value.replaceAll("-", "_")}`;
+      : tipo === "agenda"
+        ? `${pieza.maquina.value}_${pieza.fecha.value.replaceAll("-", "_") || "caratula"}_${pieza.estado.value || "fecha"}`
+        : `${pieza.maquina.value}_${pieza.fecha.value.replaceAll("-", "_")}`;
 
     link.href = url;
     link.download = `${tipo}_${detalleArchivo}.png`;
@@ -262,6 +465,11 @@ tabButtons.forEach(button => {
 });
 
 Object.entries(piezas).forEach(([tipo, pieza]) => {
+  if (tipo === "agenda") {
+    pieza.maquina.addEventListener("change", () => actualizarVista(tipo));
+    document.getElementById("agendaFechas").addEventListener("input", () => actualizarVista(tipo));
+    return;
+  }
   if (tipo === "gift") {
     pieza.premio.addEventListener("input", () => actualizarVista(tipo));
     pieza.para.addEventListener("input", () => actualizarVista(tipo));
@@ -276,3 +484,43 @@ Object.entries(piezas).forEach(([tipo, pieza]) => {
 document.querySelectorAll("[data-download]").forEach(button => {
   button.addEventListener("click", () => descargarImagen(button.dataset.download));
 });
+
+let siguienteFechaAgenda = 2;
+const agendaFechas = document.getElementById("agendaFechas");
+const agendaAgregar = document.getElementById("agendaAgregar");
+agendaAgregar.addEventListener("click", () => {
+  const fila = agendaFechas.firstElementChild.cloneNode(true);
+  const identificador = siguienteFechaAgenda++;
+  fila.querySelectorAll("input, select").forEach(campo => {
+    const idAnterior = campo.id;
+    campo.id = `${idAnterior}${identificador}`;
+    campo.value = "";
+    fila.querySelector(`label[for="${idAnterior}"]`).htmlFor = campo.id;
+  });
+  agendaFechas.appendChild(fila);
+  actualizarNumeracionAgenda();
+  fila.querySelector("input").focus({ preventScroll: true });
+});
+
+agendaFechas.addEventListener("click", event => {
+  const quitar = event.target.closest(".agenda-quitar");
+  if (!quitar) return;
+  const fila = quitar.closest(".agenda-fila");
+  if (agendaFechas.children.length === 1) {
+    fila.querySelector("input").value = "";
+    fila.querySelector("select").value = "";
+  } else {
+    fila.remove();
+  }
+  actualizarNumeracionAgenda();
+  actualizarVista("agenda");
+});
+
+function actualizarNumeracionAgenda() {
+  Array.from(agendaFechas.children).forEach((fila, indice) => {
+    fila.querySelector("legend").textContent = `Fecha ${indice + 1}`;
+    fila.querySelector(".agenda-quitar").setAttribute("aria-label", `Quitar fecha ${indice + 1}`);
+  });
+}
+
+actualizarVista("agenda");

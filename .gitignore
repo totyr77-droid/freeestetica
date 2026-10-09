@@ -1,0 +1,15 @@
+# Perfiles temporales del navegador y archivos de verificacion.
+.preview-*/
+.preview-*
+prueba-agenda*.html
+prueba-agenda*.png
+prueba-gift*.html
+prueba-gift*.png
+
+# Archivos locales y credenciales.
+.env
+.env.*
+!.env.example
+*.log
+Thumbs.db
+Desktop.ini
