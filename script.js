@@ -166,15 +166,27 @@ function configurarExport(tipo, maquina, fecha) {
   return [fondoImg];
 }
 
+function actualizarMuestraGift() {
+  const selector = piezas.gift.diseno;
+  const diseno = ["nuevo1", "nuevo2"].includes(selector.value) ? selector.value : "clasico";
+  const ruta = diseno === "clasico" ? "fondos/gif.png" : `fondos/${diseno}.png`;
+  const nombre = selector.selectedOptions[0].textContent;
+  const imagen = document.getElementById("giftDisenoImagen");
+  imagen.src = ruta;
+  imagen.alt = `Diseño: ${nombre}`;
+  document.getElementById("giftDisenoNombre").textContent = nombre;
+  return { diseno, ruta };
+}
+
 function configurarGiftCard() {
   const pieza = piezas.gift;
   const premio = pieza.premio.value.trim();
   const para = pieza.para.value.trim();
   const de = pieza.de.value.trim();
 
-  const diseno = ["nuevo1", "nuevo2"].includes(pieza.diseno.value) ? pieza.diseno.value : "clasico";
+  const { diseno, ruta } = actualizarMuestraGift();
   exportDiv.dataset.giftDiseno = diseno;
-  fondoImg.src = diseno === "clasico" ? "fondos/gif.png" : `fondos/${diseno}.png`;
+  fondoImg.src = ruta;
   baseImg.hidden = true;
   maquinaImg.hidden = true;
   ocultarCapasTexto();
@@ -351,13 +363,6 @@ function prepararVista(tipo, revision) {
   }
   fondoImg.hidden = false;
   if (tipo === "gift") {
-    const tieneTexto = pieza.premio.value.trim() || pieza.para.value.trim() || pieza.de.value.trim();
-
-    if (!tieneTexto) {
-      resetearVistaPrevia(tipo);
-      return;
-    }
-
     return Promise.all([
       ...configurarGiftCard().map(cargarImagen)
     ])
@@ -466,6 +471,7 @@ function cambiarSeccion(sectionName) {
     section.classList.toggle("active", isActive);
     section.hidden = !isActive;
   });
+  if (sectionName === "gift-card") actualizarVista("gift");
 }
 
 tabButtons.forEach(button => {
@@ -479,7 +485,10 @@ Object.entries(piezas).forEach(([tipo, pieza]) => {
     return;
   }
   if (tipo === "gift") {
-    pieza.diseno.addEventListener("change", () => actualizarVista(tipo));
+    pieza.diseno.addEventListener("change", () => {
+      actualizarMuestraGift();
+      actualizarVista(tipo);
+    });
     pieza.premio.addEventListener("input", () => actualizarVista(tipo));
     pieza.para.addEventListener("input", () => actualizarVista(tipo));
     pieza.de.addEventListener("input", () => actualizarVista(tipo));

@@ -368,6 +368,29 @@ h1 {
   font-size: 36px;
 }
 
+.gift-diseno-muestra {
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.gift-diseno-muestra img {
+  display: block;
+  width: 76px;
+  height: auto;
+  border-radius: 6px;
+}
+
+.gift-diseno-muestra figcaption {
+  font-size: 14px;
+  color: var(--text);
+}
+
 .gift-text {
   left: 50%;
   z-index: 6;
