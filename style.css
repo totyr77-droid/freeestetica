@@ -413,6 +413,34 @@ h1 {
   font-weight: 700;
 }
 
+/* Espacio libre entre el logo y las ilustraciones de los nuevos fondos. */
+#export[data-gift-diseno="nuevo1"] .gift-text,
+#export[data-gift-diseno="nuevo2"] .gift-text {
+  left: 540px;
+  width: 760px;
+  max-width: 760px;
+  color: #008a96;
+}
+
+#export[data-gift-diseno="nuevo1"] .gift-premio,
+#export[data-gift-diseno="nuevo2"] .gift-premio {
+  top: 420px;
+  height: 200px;
+  padding: 16px 24px;
+}
+
+#export[data-gift-diseno="nuevo1"] .gift-para,
+#export[data-gift-diseno="nuevo2"] .gift-para {
+  top: 650px;
+  height: 130px;
+}
+
+#export[data-gift-diseno="nuevo1"] .gift-de,
+#export[data-gift-diseno="nuevo2"] .gift-de {
+  top: 810px;
+  height: 130px;
+}
+
 #agendaArte {
   position: absolute;
   inset: 0;

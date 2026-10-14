@@ -40,6 +40,7 @@ const piezas = {
     canvas: null
   },
   gift: {
+    diseno: document.getElementById("giftDiseno"),
     premio: document.getElementById("giftPremioInput"),
     para: document.getElementById("giftParaInput"),
     de: document.getElementById("giftDeInput"),
@@ -171,7 +172,9 @@ function configurarGiftCard() {
   const para = pieza.para.value.trim();
   const de = pieza.de.value.trim();
 
-  fondoImg.src = "fondos/gif.png";
+  const diseno = ["nuevo1", "nuevo2"].includes(pieza.diseno.value) ? pieza.diseno.value : "clasico";
+  exportDiv.dataset.giftDiseno = diseno;
+  fondoImg.src = diseno === "clasico" ? "fondos/gif.png" : `fondos/${diseno}.png`;
   baseImg.hidden = true;
   maquinaImg.hidden = true;
   ocultarCapasTexto();
@@ -210,7 +213,7 @@ function ajustarGiftCard() {
     const estilo = getComputedStyle(capa);
     const etiqueta = capa.querySelector(".gift-etiqueta");
     const altura = capa.clientHeight - parseFloat(estilo.paddingTop) - parseFloat(estilo.paddingBottom)
-      - (etiqueta ? etiqueta.offsetHeight + 8 : 0);
+      - (etiqueta ? etiqueta.offsetHeight + parseFloat(estilo.rowGap) : 0);
     ajustarTextoGift(capa.querySelector(".gift-valor"), altura, capa === giftPremioTexto ? 72 : 50);
   });
 }
@@ -476,6 +479,7 @@ Object.entries(piezas).forEach(([tipo, pieza]) => {
     return;
   }
   if (tipo === "gift") {
+    pieza.diseno.addEventListener("change", () => actualizarVista(tipo));
     pieza.premio.addEventListener("input", () => actualizarVista(tipo));
     pieza.para.addEventListener("input", () => actualizarVista(tipo));
     pieza.de.addEventListener("input", () => actualizarVista(tipo));
